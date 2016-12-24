@@ -25,7 +25,7 @@ HX_QWERTY = -D_LINUX \
 	-DHAVE_STDINT_H \
 	-m32 \
 	-DNDEBUG \
-	-O2 \
+	-O3 \
 	-funroll-loops \
 	-pipe \
 	-fno-strict-aliasing \
