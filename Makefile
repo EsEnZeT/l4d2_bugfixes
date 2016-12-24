@@ -5,7 +5,7 @@ HX_METAMOD = ../mmsource
 #
 # l4d2_bugfixes.ext.so
 #
-HX_INCLUDE = -I$(HX_SDKL4D2)/public/game/server -I$(HX_SDKL4D2)/common -I$(HX_SDKL4D2)/game/shared -I. -I$(HX_SDKL4D2)/public -I$(HX_SDKL4D2)/public/engine -I$(HX_SDKL4D2)/public/mathlib -I$(HX_SDKL4D2)/public/tier0 -I$(HX_SDKL4D2)/public/tier1 -I$(HX_METAMOD)/core -I$(HX_METAMOD)/core/sourcehook -I$(HX_SOURCEMOD)/public -I$(HX_SOURCEMOD)/public/extensions -I$(HX_SOURCEMOD)/sourcepawn/include
+HX_INCLUDE = -I$(HX_SDKL4D2)/public/game/server -I. -I$(HX_SDKL4D2)/public -I$(HX_SDKL4D2)/public/engine -I$(HX_SDKL4D2)/public/tier0 -I$(HX_SDKL4D2)/public/tier1 -I$(HX_METAMOD)/core -I$(HX_METAMOD)/core/sourcehook -I$(HX_SOURCEMOD)/public -I$(HX_SOURCEMOD)/sourcepawn/include
 #
 HX_QWERTY = -D_LINUX \
 	-Dstricmp=strcasecmp \
