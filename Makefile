@@ -41,8 +41,7 @@ CPP_FLAGS = -Wno-non-virtual-dtor \
 #
 HX_SO = l4d2_release/smsdk_ext.o \
 	l4d2_release/detours.o \
-	l4d2_release/extension.o \
-	l4d2_release/asm.o
+	l4d2_release/extension.o
 #
 all:
 	mkdir -p l4d2_release
@@ -53,8 +52,7 @@ all:
 	gcc $(HX_INCLUDE) $(HX_QWERTY) $(CPP_FLAGS) -o l4d2_release/smsdk_ext.o -c smsdk_ext.cpp
 	gcc $(HX_INCLUDE) $(HX_QWERTY) $(CPP_FLAGS) -o l4d2_release/detours.o -c CDetour/detours.cpp
 	gcc $(HX_INCLUDE) $(HX_QWERTY) $(CPP_FLAGS) -o l4d2_release/extension.o -c extension.cpp
-	gcc $(HX_INCLUDE) $(HX_QWERTY) -o l4d2_release/asm.o -c asm/asm.c
 #
-	gcc $(HX_SO) $(HX_SDKL4D2)/lib/linux/tier1_i486.a $(HX_SDKL4D2)/lib/linux/mathlib_i486.a libvstdlib_srv.so libtier0_srv.so -static-libgcc -shared -m32 -lm -ldl -o l4d2_release/l4d2_bugfixes.ext.so
+	gcc $(HX_SO) $(HX_SDKL4D2)/lib/linux/tier1_i486.a $(HX_SDKL4D2)/lib/linux/mathlib_i486.a asm/asm.c libvstdlib_srv.so libtier0_srv.so -static-libgcc -shared -m32 -lm -ldl -o l4d2_release/l4d2_bugfixes.ext.so
 #
 	rm -rf l4d2_release/*.o
