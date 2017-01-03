@@ -16,6 +16,8 @@
 	typedef  bool (*tCDirector__AreTeamsFlipped)(void*);
 #endif
 
+#define L4D_MAX_PLAYERS 32
+
 /**
  * @brief Sample implementation of the SDK Extension.
  * Note: Uncomment one of the pre-defined virtual functions in order to use it.
@@ -91,6 +93,7 @@ public:
 public:
 	bool SetupHooks();
 	void RemoveHooks();
+	static void ChargerImpactPatch(bool enable);
 #endif
 };
 
