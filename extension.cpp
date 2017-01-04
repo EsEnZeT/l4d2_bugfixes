@@ -6,8 +6,6 @@
 
 #define GAMEDATA_FILE "l4d2_bugfixes"
 
-bool ChargerVSSurvivorCollisions[L4D_MAX_PLAYERS+1][L4D_MAX_PLAYERS+1];
-
 CDetour *Detour_WitchAttack__Create = NULL;
 CDetour *Detour_HandleCustomCollision = NULL;
 CDetour *Detour_CTerrorGameRules__CalculateSurvivalMultiplier = NULL;
@@ -36,7 +34,6 @@ class CRoundStartListener : public IGameEventListener2
 	int GetEventDebugID(void) { return EVENT_DEBUG_ID_INIT; }
 	void FireGameEvent(IGameEvent* pEvent){
 		g_iSurvivorCount = 0;
-		memset(&ChargerVSSurvivorCollisions[0][0],0,sizeof(ChargerVSSurvivorCollisions));
 	}
 };
 CRoundStartListener RoundStartListener;
@@ -54,19 +51,6 @@ class CVenchicleLeaving : public IGameEventListener2
 	}
 };
 CVenchicleLeaving VenchicleLeaving;
-
-class CPummelEndListener : public IGameEventListener2
-{
-	int GetEventDebugID(void) { return EVENT_DEBUG_ID_INIT; }
-	void FireGameEvent(IGameEvent* pEvent)
-	{
-		int client = playerhelpers->GetClientOfUserId(pEvent->GetInt("userid"));
-		if (client>0 && client<=L4D_MAX_PLAYERS){
-			memset(&ChargerVSSurvivorCollisions[client][0],0,sizeof(ChargerVSSurvivorCollisions[client]));
-		}
-	}
-};
-CPummelEndListener PummelEndListener;
 
 DETOUR_DECL_MEMBER1(CTerrorGameRules__CalculateSurvivalMultiplier, int ,char,survcount)
 {
@@ -122,20 +106,14 @@ DETOUR_DECL_MEMBER1(WitchAttack__WitchAttack, void* ,CBaseEntity*,pEntity)
 
 DETOUR_DECL_MEMBER5(CCharge__HandleCustomCollision, int ,CBaseEntity *,pEntity, Vector  const&, v1, Vector  const&, v2, CGameTrace *, gametrace, void *,movedata)
 {
-	int client=gamehelpers->IndexOfEdict(gameents->BaseEntityToEdict(META_IFACEPTR(CBaseEntity)));
 	int target=gamehelpers->IndexOfEdict(gameents->BaseEntityToEdict((CBaseEntity*)pEntity));
-	if (client>0 && target>0 && client<=L4D_MAX_PLAYERS && target<=L4D_MAX_PLAYERS)
+	if (target>0 && target<=L4D_MAX_PLAYERS)
 	{
-		if (!ChargerVSSurvivorCollisions[client][target])
-		{
-			ChargerVSSurvivorCollisions[client][target]=true;
-			int result;
-			BugFixes::ChargerImpactPatch(true);
-			result=DETOUR_MEMBER_CALL(CCharge__HandleCustomCollision)(pEntity,v1,v2,gametrace,movedata);
-			BugFixes::ChargerImpactPatch(false);
-
-			return result;
-		}
+		int result;
+		BugFixes::ChargerImpactPatch(true);
+		result=DETOUR_MEMBER_CALL(CCharge__HandleCustomCollision)(pEntity,v1,v2,gametrace,movedata);
+		BugFixes::ChargerImpactPatch(false);
+		return result;
 	}
 	return DETOUR_MEMBER_CALL(CCharge__HandleCustomCollision)(pEntity,v1,v2,gametrace,movedata);
 }
@@ -146,7 +124,6 @@ bool BugFixes::SDK_OnMetamodLoad( ISmmAPI *ismm, char *error, size_t maxlength, 
 	GET_V_IFACE_CURRENT(GetEngineFactory, gameevents, IGameEventManager2, INTERFACEVERSION_GAMEEVENTSMANAGER2);
 	GET_V_IFACE_CURRENT(GetEngineFactory, icvar, ICvar, CVAR_INTERFACE_VERSION);
 	GET_V_IFACE_ANY(GetServerFactory, gameents, IServerGameEnts, INTERFACEVERSION_SERVERGAMEENTS);
-	g_pCVar = icvar;
 
 	return true;
 }
@@ -180,7 +157,6 @@ bool BugFixes::SDK_OnLoad( char *error, size_t maxlength, bool late )
 	//Register events
 	gameevents->AddListener(&RoundStartListener,"round_start",true);
 	gameevents->AddListener(&VenchicleLeaving, "finale_vehicle_leaving", true);
-	gameevents->AddListener(&PummelEndListener,"charger_pummel_end",true);
 
 	//Register ConVars
 	gcv_mp_gamemode=icvar->FindVar("mp_gamemode");
@@ -211,7 +187,6 @@ void BugFixes::SDK_OnUnload()
 	//remove events
 	gameevents->RemoveListener(&RoundStartListener);
 	gameevents->RemoveListener(&VenchicleLeaving);
-	gameevents->RemoveListener(&PummelEndListener);
 
 	//remove hooks
 	RemoveHooks();

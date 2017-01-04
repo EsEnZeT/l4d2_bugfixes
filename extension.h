@@ -11,9 +11,9 @@
 #include "smsdk_ext.h"
 
 #ifdef PLATFORM_WINDOWS
-	typedef  bool (__thiscall *tCDirector__AreTeamsFlipped)(void*);
+typedef  bool (__thiscall *tCDirector__AreTeamsFlipped)(void*);
 #else
-	typedef  bool (*tCDirector__AreTeamsFlipped)(void*);
+typedef  bool (*tCDirector__AreTeamsFlipped)(void*);
 #endif
 
 #define L4D_MAX_PLAYERS 32
