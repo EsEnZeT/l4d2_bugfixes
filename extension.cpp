@@ -6,6 +6,8 @@
 
 #define GAMEDATA_FILE "l4d2_bugfixes"
 
+float fChargerVictimTime[L4D_MAX_PLAYERS+1];
+
 CDetour *Detour_WitchAttack__Create = NULL;
 CDetour *Detour_HandleCustomCollision = NULL;
 CDetour *Detour_CTerrorGameRules__CalculateSurvivalMultiplier = NULL;
@@ -109,11 +111,16 @@ DETOUR_DECL_MEMBER5(CCharge__HandleCustomCollision, int ,CBaseEntity *,pEntity, 
 	int target=gamehelpers->IndexOfEdict(gameents->BaseEntityToEdict((CBaseEntity*)pEntity));
 	if (target>0 && target<=L4D_MAX_PLAYERS)
 	{
-		int result;
-		BugFixes::ChargerImpactPatch(true);
-		result=DETOUR_MEMBER_CALL(CCharge__HandleCustomCollision)(pEntity,v1,v2,gametrace,movedata);
-		BugFixes::ChargerImpactPatch(false);
-		return result;
+		float fEngineTime = Plat_FloatTime();
+		if (fEngineTime - fChargerVictimTime[target] > 1.0)
+		{
+			fChargerVictimTime[target] = fEngineTime;
+			int result;
+			BugFixes::ChargerImpactPatch(true);
+			result=DETOUR_MEMBER_CALL(CCharge__HandleCustomCollision)(pEntity,v1,v2,gametrace,movedata);
+			BugFixes::ChargerImpactPatch(false);
+			return result;
+		}
 	}
 	return DETOUR_MEMBER_CALL(CCharge__HandleCustomCollision)(pEntity,v1,v2,gametrace,movedata);
 }
